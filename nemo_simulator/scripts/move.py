@@ -15,8 +15,7 @@ def talker():
        pub.publish(move_nemo)
 
 if __name__ == '__main__':
-    try:
-        rospy.Subscriber("/sonar_data", PointStamped, callback) 
+    try: 
         talker()
     except rospy.ROSInterruptException:
         pass
