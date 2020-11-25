@@ -1,16 +1,15 @@
 import rospy
-import std_msgs.msg 
+from geometry_msgs.msg import Twist  
 
 def talker():
-    pub = rospy.Publisher('cmd_vel',Vector3)
+    pub = rospy.Publisher('cmd_vel',Twist, queue_size=10)
     rospy.init_node('move')
     while not rospy.is_shutdown():
-        x=input("Velocidade de x")
-        y=input("Velocidade de y")
-        z=input("Velocidade de z")
-        yaw=input("Giro em z")
-        vel=[a,b,c]
-        pub.publish(vel)
+       move_nemo= Twist()
+       move_nemo.linear.x=input("Movimentacao em x")
+       move_nemo.linear.y=input("Movimentacao em y")
+       move_nemo.angular.z=input("Movimentacao em Giro")
+       pub.publish(move_nemo)
 
 if __name__ == '__main__':
     try:
