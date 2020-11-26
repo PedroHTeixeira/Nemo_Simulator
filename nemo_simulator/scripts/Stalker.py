@@ -24,6 +24,8 @@ deltay = 0
 teta = 0
 nemobloco = 0
 marlinbloco = 0
+marlinavenida = 0
+marlinrua = 0
 
 #--------------------------------------------------------------------------------------------#
 
@@ -59,7 +61,7 @@ def loop():
     #--------------------------------------------------------------------------------------------#
 
     while not rospy.is_shutdown():
-        global nemobloco,marlinbloco
+        global nemobloco,marlinbloco,marlinavenida,marlinrua
 
         x2 = x1 - deltax # Nemo
         y2 = y1 - deltay
@@ -98,6 +100,7 @@ def loop():
             nemobloco = 3
         if(-10 <= x2 < 0 and 0 < y2 <= 10): # Nemo esta no bloco d (bloco 4)
             nemobloco = 4
+
         if(0 < x1 <= 10 and 0 < y1 <= 10): # Marlin esta no bloco a (bloco 1)
             marlinbloco = 1
         if(0 < x1 <= 10 and -10 <= y1 < 0): # Marlin esta no bloco b (bloco 2)
@@ -107,9 +110,18 @@ def loop():
         if(-10 <= x1 < 0 and 0 < y1 <= 10): # Marlin esta no bloco d (bloco 4)
             marlinbloco = 4
 
+        if(4,8 <= x1 <= 5,2 and -5 <= y1 <= 5): # Marlin esta na avenida Pavani (avenida 1)
+            marlinavenida = 1
+        if(-5 <= x1 <= 5 and 4,8 <= y1 <= 5,2): # Marlin esta na avenida Ikuhara (avenida 2)
+            marlinavenida = 2
+        if(-5,2 <= x1 <= -4,8 and -5 <= y1 <= 5): # Marlin esta na avenida Daumas (avenida 3)
+            marlinavenida = 3
+        if(-5 <= x1 <= 5 and -5,2 <= y1 <= -4,8): # Marlin esta na rua Koppe (avenida 4)
+            marlinavenida = 4
+        if((4,8 <= x1 <= 5,2 and -5 <= y1 <= 5)or(-5 <= x1 <= 5 and 4,8 <= y1 <= 5,2)or(-5,2 <= x1 <= -4,8 and -5 <= y1 <= 5)or(-5 <= x1 <= 5 and -5,2 <= y1 <= -4,8)):
+            marlinavenida = 0
 
-        rospy.loginfo(marlinbloco)
-
+        rospy.loginfo(marlinavenida)
         pub.publish(move)
         
 #--------------------------------------------------------------------------------------------#
