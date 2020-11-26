@@ -28,7 +28,7 @@ def follower(x,y,z):
         move_nemo.linear.y=0
 
     if z>0:
-        move_nemo.linear.z=1
+        move_nemo.linear.z=-1
     else:
         move_nemo.linear.z=0
     
