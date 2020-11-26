@@ -67,3 +67,17 @@ if __name__ == '__main__':
         locomocao()
     except rospy.ROSInterruptException:
         pass
+'''   
+        if(x2 - x1 > 2):
+            move.linear.x = 2
+        if(x2 - x1 < -2):
+            move.linear.x = -2
+        if(y2 - y1 > 2):
+            move.linear.y = 2
+        if(y2 - y1 < -2):
+            move.linear.y = -2
+        
+        if(-2 < x2 - x1 < 2 and -2 < y2 - y1 < 2):
+            move.linear.x = 0
+            move.linear.y = 0
+        '''

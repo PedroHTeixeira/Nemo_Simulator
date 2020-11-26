@@ -10,7 +10,7 @@ from nav_msgs.msg      import Odometry
 from tf.transformations import euler_from_quaternion 
 # Necessario para a conversao para Euler
 
-from math import atan2 # Necessario para o uso do arctg
+import math # Necessario para o uso do arctg
 
 x1 = 0
 x2 = 0
@@ -22,6 +22,8 @@ yaw = 0
 deltax = 0
 deltay = 0
 teta = 0
+nemobloco = 0
+marlinbloco = 0
 
 #--------------------------------------------------------------------------------------------#
 
@@ -39,12 +41,11 @@ def odometria(msg):
 #--------------------------------------------------------------------------------------------#
 
 def sonar(msg):
-    global deltax,deltay,teta
+    global deltax,deltay
 
     deltax = msg.point.x
     deltay = msg.point.y
 
-    teta = atan2(deltax,deltay)
 
 def loop():
 
@@ -58,9 +59,12 @@ def loop():
     #--------------------------------------------------------------------------------------------#
 
     while not rospy.is_shutdown():
+        global nemobloco,marlinbloco
 
         x2 = x1 - deltax # Nemo
         y2 = y1 - deltay
+        teta = math.atan2(deltax,deltay)
+        teta = math.degrees(teta)
 
         pub = rospy.Publisher('cmd_vel',Twist, queue_size=10)
 
@@ -72,7 +76,7 @@ def loop():
         #antihorario = move.angular.z= -3
         #paradax = move.linear.x=0
         #paraday = move.linear.y=0
-            
+         
         if(x2 - x1 > 2):
             move.linear.x = 2
         if(x2 - x1 < -2):
@@ -85,7 +89,27 @@ def loop():
         if(-2 < x2 - x1 < 2 and -2 < y2 - y1 < 2):
             move.linear.x = 0
             move.linear.y = 0
-        
+
+        if(0 < x2 <= 10 and 0 < y2 <= 10): # Nemo esta no bloco a (bloco 1)
+            nemobloco = 1
+        if(0 < x2 <= 10 and -10 <= y2 < 0): # Nemo esta no bloco b (bloco 2)
+            nemobloco = 2
+        if(-10 <= x2 < 0 and -10 <= y2 < 0): # Nemo esta no bloco c (bloco 3)
+            nemobloco = 3
+        if(-10 <= x2 < 0 and 0 < y2 <= 10): # Nemo esta no bloco d (bloco 4)
+            nemobloco = 4
+        if(0 < x1 <= 10 and 0 < y1 <= 10): # Marlin esta no bloco a (bloco 1)
+            marlinbloco = 1
+        if(0 < x1 <= 10 and -10 <= y1 < 0): # Marlin esta no bloco b (bloco 2)
+            marlinbloco = 2
+        if(-10 <= x1 < 0 and -10 <= y1 < 0): # Marlin esta no bloco c (bloco 3)
+            marlinbloco = 3
+        if(-10 <= x1 < 0 and 0 < y1 <= 10): # Marlin esta no bloco d (bloco 4)
+            marlinbloco = 4
+
+
+        rospy.loginfo(marlinbloco)
+
         pub.publish(move)
         
 #--------------------------------------------------------------------------------------------#
@@ -98,7 +122,7 @@ if __name__ == '__main__':
 
 #--------------------------------------------------------------------------------------------#
 
-time.sleep(18)
+time.sleep(20)
 rospy.spin()
 
 #--------------------------------------------------------------------------------------------#
