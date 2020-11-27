@@ -2,10 +2,13 @@
 <launch>
     <rosparam command="load" file="$(find nemo_simulator)/param/sonar.yaml"/>
     <node name='sonar' pkg="nemo_simulator" type='sonar.py'/>
+<<<<<<< HEAD
     <node name='auto_move' pkg="nemo_simulator" type='auto_move.py'/>
     <node name='follow' pkg="nemo_simulator" type='follower.py'/>
     <node name='limits' pkg="nemo_simulator" type='limits.py'/>
     <node name='interpreter' pkg="nemo_simulator" type='camera.py'/>
+=======
+>>>>>>> 210d1590d9eebaca624e5ceb2c54e572c2ec463c
     <arg name="world"  default="task"/>
     <arg name="gui"  default="true"/>
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
