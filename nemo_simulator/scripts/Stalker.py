@@ -119,6 +119,10 @@ def loop():
 
         # Comandos caso Marlin esteja procurando Nemo (SearchMode)
         if(SearchMode == True):
+            
+            while(move.angular.z > 0):
+                move.linear.x = 0
+                move.linear.y = 0
 
             # Ida ao centro do bloco para localizar Nemo ou para Marlin se auto localizar
             if(marlinbloco == 1):              # No bloco 1

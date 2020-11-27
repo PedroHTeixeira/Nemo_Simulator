@@ -10,86 +10,232 @@ from nav_msgs.msg      import Odometry
 from tf.transformations import euler_from_quaternion 
 # Necessario para a conversao para Euler
 
-from math import atan2 # Necessario para o uso do arctg
+import math # Necessario para o uso do arctg
 
-x = 0.0 # Coordenada x, em coordenada arbitraria
-y = 0.0 # Coordenada y, em coordenada arbitraria
-yaw = 0 # Yaw, em graus
+x1 = 0
+x2 = 0
+y1 = 0
+y2 = 0
+roll = 0
+pitch = 0
+yaw = 0
+deltax = 0
+deltay = 0
+teta = 0
+nemobloco = 0
+marlinbloco = 0
+StalkerMode = False
+SearchMode  = True
 
-def locomocao(msg):
-    global x
-    global y
-    global yaw
+#--------------------------------------------------------------------------------------------#
 
+def odometria(msg):
+    global x1,y1,roll,pitch,yaw
 
-    x = msg.pose.pose.position.x
-    y = msg.pose.pose.position.y
+    x1 = msg.pose.pose.position.x # Marlin
+    y1 = msg.pose.pose.position.y
 
     quat = msg.pose.pose.orientation # Quaternion da posicao do Marlin
 
     (roll, pitch, yaw) = euler_from_quaternion([quat.x,quat.y,quat.z,quat.w]) # Transformada
 
-rospy.init_node ('teste') # Inicializacao
+#--------------------------------------------------------------------------------------------#
 
-sub = rospy.Subscriber('/odon', Odometry, locomocao) # Recebe a mensagem (Subscriber)
+def sonar(msg):
+    global deltax,deltay
 
-pub = rospy.Publisher('cmd_vel',Twist, queue_size=10) # Envia a mensagem (Publisher)
-#Envia os comandos para o Marlin
+    deltax = msg.point.x
+    deltay = msg.point.y
 
-velocidade = Twist()
 
-tempo = rospy.Rate(4)
+def loop():
 
-destino = Point ()
-destino.x = 2
-destino.y = 2
+    rospy.init_node('Stalker')
 
-while not rospy.is_shutdown(): # Loop do sistema
+    rospy.Subscriber("/sonar_data", PointStamped, sonar)
+    rospy.Subscriber('/odom', Odometry, odometria) 
 
-    deltax = destino.x - x   # Obtencao dos deltas
-    deltay = destino.y - y
+    move = Twist()
 
-    angulocarrinhos = atan2(deltax,deltay)
+    #--------------------------------------------------------------------------------------------#
 
-    if abs(angulocarrinhos - yaw) > 0.1:
-        velocidade.linear.x = 0.0
-        velocidade.angular.z = 3
-    else:
-        velocidade.linear.x = 3
-        velocidade.angular.z = 0.0
-    
-    tempo.sleep()
-    pub.publish(velocidade)
+    while not rospy.is_shutdown():
+        global nemobloco,marlinbloco,marlinlocalizacao,Searchmode,StalkerMode,yaw
 
-    
+        r = rospy.Rate(4)
+
+        x2 = x1 - deltax # Nemo
+        y2 = y1 - deltay
+        teta = math.atan2(deltax,deltay)#                                           ^  Eixo y                                             |
+        #                                                                           |
+        pub = rospy.Publisher('cmd_vel',Twist, queue_size=10) #               Rua Ikuhara
+        #                                                            (--7;6) ------------ (7; 6)
+        #direita = move.linear.x=3      #                                     |          |
+        #esquerda= move.linear.x= -3    #                                     |          |
+        #frente = move.linear.y=3       #                       Avenida Daumas|          | Avenida Pavani     --> Eixo x
+        #tras = move.linear.y=-3        #                                     |          |
+        #horario = move.angular.z= 3    #                           (-7;-6.2) ------------(7;-6.2)
+        #antihorario = move.angular.z=-3#                                      Rua Koppe
+        #paradax = move.linear.x=0
+        #paraday = move.linear.y=0
+        
+        # Funcoes para identificacao de posicoes
+        if(0 < x2 <= 10 and 0 < y2 <= 10):          # Nemo esta no bloco a (bloco 1)
+            nemobloco = 1
+        if(0 < x2 <= 10 and -10 <= y2 < 0):         # Nemo esta no bloco b (bloco 2)
+            nemobloco = 2
+        if(-10 <= x2 < 0 and -10 <= y2 < 0):        # Nemo esta no bloco c (bloco 3)
+            nemobloco = 3
+        if(-10 <= x2 < 0 and 0 < y2 <= 10):         # Nemo esta no bloco d (bloco 4)
+            nemobloco = 4
+
+        if(0 < x1 <= 10 and 0 < y1 <= 10):          # Marlin esta no bloco a (bloco 1)
+            marlinbloco = 1
+        if(0 < x1 <= 10 and -10 <= y1 < 0):         # Marlin esta no bloco b (bloco 2)
+            marlinbloco = 2
+        if(-10 <= x1 < 0 and -10 <= y1 < 0):        # Marlin esta no bloco c (bloco 3)
+            marlinbloco = 3
+        if(-10 <= x1 < 0 and 0 < y1 <= 10):         # Marlin esta no bloco d (bloco 4)
+            marlinbloco = 4
+
+        # Ruas e interseccoes
+        if(5 <= y1 <= 6 and 6 <= x1 <= 7):   # Interseccao do bloco 1
+            marlinlocalizacao = 1
+        elif(-6.4 <= y1 <= 5 and 6 <= x1 <= 7):  # Rua Pavani
+            marlinlocalizacao = 2
+        elif(-7.4 <= y1 <= -6.4 and 6 <= x1 <= 7): # Interseccao do bloco 2
+            marlinlocalizacao = 3
+        elif(-7.4 <= y1 <= -6.4 and -6 <= x1 <= 6): # Rua Koppe
+            marlinlocalizacao = 4
+        elif(-7.4 <= y1 <= -6.4 and -7 <= x1 <= -6): # Interseccao do bloco 3
+            marlinlocalizacao = 5
+        elif(-6.4 <= y1 <= 5 and -7 <= x1 <= -6):   # Rua Daumas
+            marlinlocalizacao = 6
+        elif(5 <= y1 <= 6 and -7 <= x1 <= -6):     # Interseccao do bloco 4
+            marlinlocalizacao = 7
+        elif(5 <= y1 <= 6 and -6 <= x1 <= 6):   # Rua Ikuhara
+            marlinlocalizacao = 8
+        else:                               # Perdido
+            marlinlocalizacao = 0
+
+        # Comandos caso Marlin esteja procurando Nemo (SearchMode)
+        if(SearchMode == True):
+
+            # Marlin esta perdido
+            if(marlinlocalizacao == 0 and marlinbloco == 1):
+                    if(7 - x1 >= 0.5):
+                        move.linear.x=3
+                    elif(-0.5 < 7 - x1 < 0.5 and y1 > 6):
+                        move.linear.y=-3
+                    else:
+                        move.linear.x=-3
+            if(marlinlocalizacao == 0 and marlinbloco == 2):
+                    if(7 - x1 >= 0.5):
+                        move.linear.x=3
+                    elif(-0.5 < 7 - x1 < 0.5 and y1 < -6.2):
+                        move.linear.y=3
+                    else:
+                        move.linear.x=-3     
+            if(marlinlocalizacao == 0 and marlinbloco == 3):
+                    if(-7 - x1 >= 0.5):
+                        move.linear.x=3
+                    elif(-0.5 < -7 - x1 < 0.5 and y1 < -6.2):
+                        move.linear.y=3
+                    else:
+                        move.linear.x=-3
+            if(marlinlocalizacao == 0 and marlinbloco == 4):
+                    if(-7 - x1 >= 0.5):
+                        move.linear.x=3
+                    elif(-0.5 < -7 - x1 < 0.5 and y1 > 6):
+                        move.linear.y=-3
+                    else:
+                        move.linear.x=-3
+                
+            # Marlin esta nas interseccoes
+            if(marlinlocalizacao == 1):   # Int 1
+                if(marlinbloco == nemobloco): # Marlin e Nemo no mesmo bloco 1
+                    move.linear.x = 0
+                    move.linear.y = 0
+                    move.angular.z = -2
+                else:
+                    if (yaw < 3.08):
+                        move.angular.z = -2
+                    elif (yaw > 3.20):
+                        move.angular.z = 2
+                    else:
+                        move.angular.z = 0
+                        rospy.sleep(1)
+                        move.linear.x = 0
+                        move.linear.y = 2
+            elif(marlinlocalizacao == 3): # Int 2
+                if(marlinbloco == nemobloco): # Marlin e Nemo no mesmo bloco 2
+                    move.linear.x = 0
+                    move.linear.y = 0
+                    move.angular.z = -2
+                else:
+                    if (yaw < 4.65):
+                        move.angular.z = -2
+                    elif (yaw > 4.77):
+                        move.angular.z = 2
+                    else:
+                        move.angular.z = 0
+                        rospy.sleep(1)
+                        move.linear.x = 0
+                        move.linear.y = 2
+            elif(marlinlocalizacao == 5): # Int 3
+                if(marlinbloco == nemobloco): # Marlin e Nemo no mesmo bloco 3
+                    move.linear.x = 0
+                    move.linear.y = 0
+                    move.angular.z = -2
+                else:
+                    if (yaw < 6.22):
+                        move.angular.z = -2
+                    elif (yaw > 6.34):
+                        move.angular.z = 2
+                    else:
+                        move.angular.z = 0
+                        rospy.sleep(1)
+                        move.linear.x = 0
+                        move.linear.y = 2
+            elif(marlinlocalizacao == 7): # Int 4
+            
+                if(marlinbloco == nemobloco): # Marlin e Nemo no mesmo bloco 4
+                    move.linear.x = 0
+                    move.linear.y = 0
+                    move.angular.z = -2
+                else:
+                    if (yaw < 1.51):
+                        move.angular.z = -2
+                    elif (yaw > 1.63):
+                        move.angular.z = 2
+                    else:
+                        move.angular.z = 0
+                        rospy.sleep(1)
+                        move.linear.x = 0
+                        move.linear.y = 2
+
+            # Marlin esta nas ruas
+            elif(marlinlocalizacao == 2 or marlinlocalizacao == 4 or marlinlocalizacao == 6 or marlinlocalizacao == 6): 
+                move.linear.x = 0
+                move.linear.y = 2
+                move.angular.z = 0
+
+        rospy.loginfo(yaw)
+
+        pub.publish(move)
+        r.sleep()
+        
+#--------------------------------------------------------------------------------------------#
+
 if __name__ == '__main__':
     try: 
-        locomocao()
+        loop()
     except rospy.ROSInterruptException:
         pass
-'''   
-        if(x2 - x1 > 2):
-            move.linear.x = 2
-        if(x2 - x1 < -2):
-            move.linear.x = -2
-        if(y2 - y1 > 2):
-            move.linear.y = 2
-        if(y2 - y1 < -2):
-            move.linear.y = -2
-        
-        if(-2 < x2 - x1 < 2 and -2 < y2 - y1 < 2):
-            move.linear.x = 0
-            move.linear.y = 0
-        '''
-    if(x2 - x1 > 2):
-            move.linear.x = 2
-        if(x2 - x1 < -2):
-            move.linear.x = -2
-        if(y2 - y1 > 2):
-            move.linear.y = 2
-        if(y2 - y1 < -2):
-            move.linear.y = -2
-        
-        if(-2 < x2 - x1 < 2 and -2 < y2 - y1 < 2):
-            move.linear.x = 0
-            move.linear.y = 0
+
+#--------------------------------------------------------------------------------------------#
+
+time.sleep(20)
+rospy.spin()
+
+#--------------------------------------------------------------------------------------------#
