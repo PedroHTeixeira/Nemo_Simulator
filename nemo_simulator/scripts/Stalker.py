@@ -65,17 +65,17 @@ def loop():
 
         x2 = x1 - deltax # Nemo
         y2 = y1 - deltay
-        teta = math.atan2(deltax,deltay)
-        teta = math.degrees(teta)
-
-        pub = rospy.Publisher('cmd_vel',Twist, queue_size=10)
-
-        #frente = move.linear.x=3
-        #tras= move.linear.x= -3
-        #direita = move.linear.y=3
-        #esquerda = move.linear.y=-3
-        #horario = move.angular.z= 3
-        #antihorario = move.angular.z= -3
+        teta = math.atan2(deltax,deltay)#                                           ^  Eixo y
+        teta = math.degrees(teta)#                                                  |
+        #                                                                           |
+        pub = rospy.Publisher('cmd_vel',Twist, queue_size=10) #               Rua Ikuhara
+        #                                                                     ------------
+        #direita = move.linear.x=3      #                                     |          |
+        #esquerda= move.linear.x= -3    #                                     |          |
+        #frente = move.linear.y=3       #                       Avenida Daumas|          | Avenida Pavani     --> Eixo x
+        #tras = move.linear.y=-3        #                                     |          |
+        #horario = move.angular.z= 3    #                                     ------------
+        #antihorario = move.angular.z=-3#                                      Rua Koppe
         #paradax = move.linear.x=0
         #paraday = move.linear.y=0
 
