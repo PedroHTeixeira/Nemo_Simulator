@@ -27,6 +27,7 @@ marlinbloco = 0
 andar = True
 StalkerMode = False
 SearchMode  = True
+teste = True
 
 #--------------------------------------------------------------------------------------------#
 
@@ -61,7 +62,7 @@ def loop():
     #--------------------------------------------------------------------------------------------#
 
     while not rospy.is_shutdown():
-        global nemobloco,marlinbloco,marlinlocalizacao,Searchmode,StalkerMode,andar
+        global nemobloco,marlinbloco,marlinlocalizacao,Searchmode,StalkerMode,andar,teste
 
         x2 = x1 - deltax # Nemo
         y2 = y1 - deltay
@@ -121,6 +122,11 @@ def loop():
         # Comandos caso Marlin esteja procurando Nemo (SearchMode)
         if(SearchMode == True):
             
+            if(nemobloco == marlinbloco):
+                teste = True
+            else:
+                teste = False
+
             if(andar == False and nemobloco != marlinbloco):
                 if(yaw < -0.04):
                     move.angular.z = 3
