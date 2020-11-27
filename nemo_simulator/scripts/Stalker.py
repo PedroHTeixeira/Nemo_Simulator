@@ -78,19 +78,6 @@ def loop():
         #antihorario = move.angular.z= -3
         #paradax = move.linear.x=0
         #paraday = move.linear.y=0
-         
-        if(x2 - x1 > 2):
-            move.linear.x = 2
-        if(x2 - x1 < -2):
-            move.linear.x = -2
-        if(y2 - y1 > 2):
-            move.linear.y = 2
-        if(y2 - y1 < -2):
-            move.linear.y = -2
-        
-        if(-2 < x2 - x1 < 2 and -2 < y2 - y1 < 2):
-            move.linear.x = 0
-            move.linear.y = 0
 
         if(0 < x2 <= 10 and 0 < y2 <= 10): # Nemo esta no bloco a (bloco 1)
             nemobloco = 1
@@ -110,18 +97,59 @@ def loop():
         if(-10 <= x1 < 0 and 0 < y1 <= 10): # Marlin esta no bloco d (bloco 4)
             marlinbloco = 4
 
-        if(4,8 <= x1 <= 5,2 and -5 <= y1 <= 5): # Marlin esta na avenida Pavani (avenida 1)
+        if(2.6 <= x1 <= 3.4 and -5 <= y1 <= 5): # Marlin esta na avenida Pavani (avenida 1)
             marlinavenida = 1
-        if(-5 <= x1 <= 5 and 4,8 <= y1 <= 5,2): # Marlin esta na avenida Ikuhara (avenida 2)
+        elif(-3.4 <= x1 <= -2.6 and -5 <= y1 <= 5): # Marlin esta na avenida Daumas (avenida 2)
             marlinavenida = 2
-        if(-5,2 <= x1 <= -4,8 and -5 <= y1 <= 5): # Marlin esta na avenida Daumas (avenida 3)
-            marlinavenida = 3
-        if(-5 <= x1 <= 5 and -5,2 <= y1 <= -4,8): # Marlin esta na rua Koppe (avenida 4)
-            marlinavenida = 4
-        if((4,8 <= x1 <= 5,2 and -5 <= y1 <= 5)or(-5 <= x1 <= 5 and 4,8 <= y1 <= 5,2)or(-5,2 <= x1 <= -4,8 and -5 <= y1 <= 5)or(-5 <= x1 <= 5 and -5,2 <= y1 <= -4,8)):
+        else:
             marlinavenida = 0
 
-        rospy.loginfo(marlinavenida)
+        if(-5 <= x1 <= 5 and 3.6 <= y1 <= 4.4): # Marlin esta na rua Ikuhara (rua 1)
+            marlinrua = 1
+        elif(-5 <= x1 <= 5 and -3.4 <= y1 <= -2.6): # Marlin esta na rua Koppe (rua 2)
+            marlinrua = 2
+        else:
+            marlinrua = 0
+
+        #if(marlinavenida == 1 and marlinrua == 1): # Search Bloco 1
+        #if(marlinavenida == 1 and marlinrua == 2): # Search Bloco 2
+        #if(marlinavenida == 2 and marlinrua == 1): # Search Bloco 4
+        #if(marlinavenida == 2 and marlinrua == 2): # Search Bloco 3
+        
+        if(marlinbloco == 1 and (marlinavenida == 0 and marlinrua == 0)): # Marlin perdido no bloco 1
+            if(5 - x1 > 0):
+                move.linear.x=3
+            elif(5 - x1 == 0):
+                move.linear.y=-3
+            else:
+                move.linear.x=-3
+
+        if(marlinbloco == 2 and (marlinavenida == 0 and marlinrua == 0)): # Marlin perdido no bloco 2
+            if(5 - x1 > 0):
+                move.linear.x=3
+            elif(5 - x1 == 0):
+                move.linear.y=3
+            else:
+                move.linear.x=-3
+
+        if(marlinbloco == 3 and (marlinavenida == 0 and marlinrua == 0)): # Marlin perdido no bloco 3
+            if(-5 - x1 > 0):
+                move.linear.x=3
+            elif(-5 - x1 == 0):
+                move.linear.y=3
+            else:
+                move.linear.x=-3
+
+        if(marlinbloco == 4 and (marlinavenida == 0 and marlinrua == 0)): # Marlin perdido no bloco 4
+            if(-5 - x1 > 0):
+                move.linear.x=3
+            elif(-5 - x1 == 0):
+                move.linear.y=-3
+            else:
+                move.linear.x=-3
+            
+        rospy.loginfo(marlinbloco)
+
         pub.publish(move)
         
 #--------------------------------------------------------------------------------------------#
