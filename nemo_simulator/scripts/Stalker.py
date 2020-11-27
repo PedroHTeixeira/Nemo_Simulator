@@ -40,7 +40,6 @@ def odometria(msg):
     quat = msg.pose.pose.orientation # Quaternion da posicao do Marlin
 
     (roll, pitch, yaw) = euler_from_quaternion([quat.x,quat.y,quat.z,quat.w]) # Transformada
- 
 
 #--------------------------------------------------------------------------------------------#
 
@@ -63,7 +62,7 @@ def loop():
     #--------------------------------------------------------------------------------------------#
 
     while not rospy.is_shutdown():
-        global nemobloco,marlinbloco,marlinavenida,marlinrua,Searchmode,StalkerMode
+        global nemobloco,marlinbloco,marlinlocalizacao,Searchmode,StalkerMode
 
         x2 = x1 - deltax # Nemo
         y2 = y1 - deltay
@@ -100,79 +99,50 @@ def loop():
         if(-10 <= x1 < 0 and 0 < y1 <= 10):         # Marlin esta no bloco d (bloco 4)
             marlinbloco = 4
 
-        if(2.2 <= x1 <= 3.8 and -5 <= y1 <= 5):     # Marlin esta na avenida Pavani (avenida 1)
-            marlinavenida = 1
-        elif(-3.8 <= x1 <= -2.2 and -5 <= y1 <= 5): # Marlin esta na avenida Daumas (avenida 2)
-            marlinavenida = 2
-        else:                                       # Marlin esta fora de avenidas
-            marlinavenida = 0
-        if(-5 <= x1 <= 5 and 3.2 <= y1 <= 4.8):     # Marlin esta na rua Ikuhara (rua 1)
-            marlinrua = 1
-        elif(-5 <= x1 <= 5 and -3.8 <= y1 <= -2.2): # Marlin esta na rua Koppe (rua 2)
-            marlinrua = 2
-        else:                                       # marlin esta fora de ruas
-            marlinrua = 0
-        
-        # Rotacoes horarias no meio dos blocos, a fim de achar Nemo
-        if(marlinavenida == 1 and marlinrua == 1 and nemobloco == 1): # Search Bloco 1
-            move.angular.z= 3
-        if(marlinavenida == 1 and marlinrua == 2 and nemobloco == 2): # Search Bloco 2
-            move.angular.z= 3
-        if(marlinavenida == 2 and marlinrua == 1 and nemobloco == 4): # Search Bloco 4
-            move.angular.z= 3
-        if(marlinavenida == 2 and marlinrua == 2 and nemobloco == 3): # Search Bloco 3
-            move.angular.z= 3
+        # Ruas e interseccoes
+        if(5 <= y1 <= 6 and 6 <= x1 <= 7):   # Interseccao do bloco 1
+            marlinlocalizacao = 1
+        if(-5.2 <= y1 <= 5 and 6 <= x1 <= 7):  # Rua Pavani
+            marlinlocalizacao = 2
+        if(-6.2 <= y1 <= -5.2 and 6 <= x1 <= 7): # Interseccao do bloco 2
+            marlinlocalizacao = 3
+        if(-6.2 <= y1 <= -5.2 and -6 <= x1 <= 6): # Rua Koppe
+            marlinlocalizacao = 4
+        if(-6.2 <= y1 <= -5.2 and -7 <= x1 <= -6): # Interseccao do bloco 3
+            marlinlocalizacao = 5
+        if(-5.2 <= y1 <= 5 and -7 <= x1 <= -6):   # Rua Daumas
+            marlinlocalizacao = 6
+        if(5 <= y1 <= 6 and -7 <= x1 <= -6):     # Interseccao do bloco 4
+            marlinlocalizacao = 7
+        if(5 <= y1 <= 6 and -6 <= x1 <= 6):   # Rua Ikuhara
+            marlinlocalizacao = 8
+        else:                               # Perdido
+            marlinlocalizacao = 0
         
         # Comandos caso Marlin esteja procurando Nemo (SearchMode)
         if(SearchMode == True):
 
             # Caso Marlin se perca
-            if(marlinbloco == 1 and (marlinavenida == 0 and marlinrua == 0)): # Marlin perdido no bloco 1
-                if(5 - x1 >= 1):
-                    move.linear.x=2
-                elif(-1 < 5 - x1 < 1 and y1 > 4.8):
-                    move.linear.y=-2
-                else:
-                    move.linear.x=-2
-            if(marlinbloco == 2 and (marlinavenida == 0 and marlinrua == 0)): # Marlin perdido no bloco 2
-                if(5 - x1 >= 1):
-                    move.linear.x=2
-                elif(-1 < 5 - x1  < 1 and y1 < -3.8):
-                    move.linear.y=2
-                else:
-                    move.linear.x=-2
-            if(marlinbloco == 2 and (marlinavenida == 0 and marlinrua == 0)): # Marlin perdido no bloco 3
-                if(-5 - x1 >= 1):
-                    move.linear.x=2
-                elif(-1 < -5 - x1  < 1 and y1 < -3.8):
-                    move.linear.y=2
-                else:
-                    move.linear.x=-2
-            if(marlinbloco == 4 and (marlinavenida == 0 and marlinrua == 0)): # Marlin perdido no bloco 4
-                if(-5 - x1 >= 1):
-                    move.linear.x=2
-                elif( -1< -5 - x1 < 1 and y1 > 4.8):
-                    move.linear.y=-2
-                else:
-                    move.linear.x=-2
-
-            # Caso Marlin esteja em uma avenida ou rua
-            if(marlinbloco != nemobloco):
-                if(marlinavenida == 1): # Marlin esta em avenida Pavani
-                    move.linear.x=0
-                    move.linear.y=0 #-3
-                if(marlinavenida == 2): # Marlin esta em avenida Daumas
-                    move.linear.x=0
-                    move.linear.y=0 #3
-                if(marlinrua == 1):     # Marlin esta em rua Ikuhara
-                    move.linear.x=0 #3
-                    move.linear.y=0
-                if(marlinrua == 2):     # Marlin esta em rua Koppe
-                    move.linear.x=0 #-3
-                    move.linear.y=0
+            if(marlinbloco == 1):              # No bloco 1
+                if(marlinlocalizacao == 0):
+                    if(7 - x1 >= 1):
+                        move.linear.x=2
+                    elif(-1 < 7 - x1 < 1 and y1 > 6):
+                        move.linear.y=-2
+                    else:
+                        move.linear.x=-2
+                if(marlinlocalizacao == 2)
+                    move.linear.x = 0
+                    move.linear.y = 2
+                if(marlinlocalizacao == 8)
+                    move.linear.x = 2
+                    move.linear.y = 0
+                if(marlinlocalizacao == 1)
+                    move.linear.x = 0
+                    move.linear.y = 0
+                    move.angular.z = 2
         
-
-        rospy.loginfo(marlinrua)
+        rospy.loginfo(marlinlocalizacao)
 
         pub.publish(move)
         
