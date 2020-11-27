@@ -32,7 +32,7 @@ def follow():
     rate = rospy.Rate(10) # 10hz
     while not rospy.is_shutdown():
         if w==1:
-            pass
+            time.sleep(2.20)
         else:
             if x > 4:
                 move_nemo.angular.z=-3
@@ -54,6 +54,7 @@ def follow():
                 move_nemo.linear.y=0
             else:
                 move_nemo.linear.y=0
+                move_nemo.angular.z=1
             if z>3:
                 move_nemo.linear.z=-1
                 move_nemo.linear.y=-1
@@ -63,6 +64,8 @@ def follow():
                     move_nemo.linear.y=-1
                 elif y > 3:
                     move_nemo.linear.y=1
+
+
             pub.publish(move_nemo)
             rate.sleep()
 

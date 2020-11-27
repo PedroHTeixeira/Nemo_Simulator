@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import cv2
 import rospy
-from std_msgs.msg import Int64
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import time
@@ -43,4 +42,8 @@ def reader():
     rospy.spin()
 
 if __name__ == '__main__':
-    reader()
+    try:
+        reader()
+    except rospy.ROSInterruptException:
+        pass
+    

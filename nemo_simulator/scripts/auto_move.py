@@ -12,6 +12,10 @@ def turn():
     pub.publish(move_nemo)
     time.sleep(2.80)
     move_nemo.angular.z=0
+    move_nemo.linear.y=-1
+    pub.publish(move_nemo)
+    time.sleep(2.20)
+    move_nemo.linear.y=0
     pub.publish(move_nemo)
 
 if __name__ == '__main__':
