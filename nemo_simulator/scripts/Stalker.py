@@ -132,8 +132,6 @@ def loop():
                     move.angular.z = 3
                 if(yaw > 0.04):
                     move.angular.z = -3
-                else:
-                    move.angular.z = 0
 
             if (-0.04 < yaw < 0.04):
                 andar = True
@@ -156,10 +154,10 @@ def loop():
                     move.linear.x = 3
                     move.linear.y = 0
                 if(marlinlocalizacao == 1):
-                    move.linear.x = 0
-                    move.linear.y = 0
-                    if(marlinbloco == nemobloco):
-                            move.angular.z = -3
+                    if(nemobloco == marlinbloco):
+                        move.linear.x = 0
+                        move.linear.y = 0
+                        move.angular.z = -3
             if(marlinbloco == 2):              # No bloco 2
                 if(marlinlocalizacao == 0):
                     if(7 - x1 >= 0.5):
@@ -175,9 +173,9 @@ def loop():
                     move.linear.x = 3
                     move.linear.y = 0
                 if(marlinlocalizacao == 3):
-                    move.linear.x = 0
-                    move.linear.y = 0
-                    if(marlinbloco == nemobloco):
+                    if(nemobloco == marlinbloco):
+                        move.linear.x = 0
+                        move.linear.y = 0
                         move.angular.z = -3
             if(marlinbloco == 3):              # No bloco 3
                 if(marlinlocalizacao == 0):
@@ -194,9 +192,9 @@ def loop():
                     move.linear.x = 0
                     move.linear.y = -3
                 if(marlinlocalizacao == 5):
-                    move.linear.x = 0
-                    move.linear.y = 0
-                    if(marlinbloco == nemobloco):
+                    if(nemobloco == marlinbloco):
+                        move.linear.x = 0
+                        move.linear.y = 0
                         move.angular.z = -3
             if(marlinbloco == 4):              # No bloco 4
                 if(marlinlocalizacao == 0):
@@ -213,9 +211,9 @@ def loop():
                     move.linear.x = 0
                     move.linear.y = 3
                 if(marlinlocalizacao == 7):
-                    move.linear.x = 0
-                    move.linear.y = 0
-                    if(marlinbloco == nemobloco):
+                    if(nemobloco == marlinbloco):
+                        move.linear.x = 0
+                        move.linear.y = 0
                         move.angular.z = -3
             
             # Caso bloco do Nemo seja diferente do de Marlin
@@ -224,27 +222,35 @@ def loop():
                     if(marlinlocalizacao == 1):
                         move.linear.x = 0
                         move.linear.y = -3
+                        move.angular.z = 0
                     if(marlinlocalizacao == 2):
                         move.linear.x = 0
                         move.linear.y = -3
+                        move.angular.z = 0
                     if(marlinlocalizacao == 3):
                         move.linear.x = -3
                         move.linear.y = 0
+                        move.angular.z = 0
                     if(marlinlocalizacao == 4):
                         move.linear.x = -3
                         move.linear.y = 0
+                        move.angular.z = 0
                     if(marlinlocalizacao == 5):
                         move.linear.x = 0
                         move.linear.y = 3
+                        move.angular.z = 0
                     if(marlinlocalizacao == 6):
                         move.linear.x = 0
                         move.linear.y = 3
+                        move.angular.z = 0
                     if(marlinlocalizacao == 7):
                         move.linear.x = 3
                         move.linear.y = 0
+                        move.angular.z = 0
                     if(marlinlocalizacao == 8):
                         move.linear.x = 3
                         move.linear.y = 0
+                        move.angular.z = 0
 
         rospy.loginfo(andar)
 
