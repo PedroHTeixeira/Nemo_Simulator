@@ -24,6 +24,7 @@ deltay = 0
 teta = 0
 nemobloco = 0
 marlinbloco = 0
+andar = True
 StalkerMode = False
 SearchMode  = True
 
@@ -60,7 +61,7 @@ def loop():
     #--------------------------------------------------------------------------------------------#
 
     while not rospy.is_shutdown():
-        global nemobloco,marlinbloco,marlinlocalizacao,Searchmode,StalkerMode
+        global nemobloco,marlinbloco,marlinlocalizacao,Searchmode,StalkerMode,andar
 
         x2 = x1 - deltax # Nemo
         y2 = y1 - deltay
@@ -77,7 +78,7 @@ def loop():
         #antihorario = move.angular.z=-3#                                      Rua Koppe
         #paradax = move.linear.x=0
         #paraday = move.linear.y=0
-        
+
         # Funcoes para identificacao de posicoes
         if(0 < x2 <= 10 and 0 < y2 <= 10):          # Nemo esta no bloco a (bloco 1)
             nemobloco = 1
@@ -120,9 +121,18 @@ def loop():
         # Comandos caso Marlin esteja procurando Nemo (SearchMode)
         if(SearchMode == True):
             
-            while(move.angular.z > 0):
-                move.linear.x = 0
-                move.linear.y = 0
+            if(andar == False and nemobloco != marlinbloco):
+                if(yaw < -0.04):
+                    move.angular.z = 3
+                if(yaw > 0.04):
+                    move.angular.z = -3
+                else:
+                    move.angular.z = 0
+
+            if (-0.04 < yaw < 0.04):
+                andar = True
+            else:
+                andar = False
 
             # Ida ao centro do bloco para localizar Nemo ou para Marlin se auto localizar
             if(marlinbloco == 1):              # No bloco 1
@@ -133,15 +143,17 @@ def loop():
                         move.linear.y=-3
                     else:
                         move.linear.x=-3
-                if(marlinlocalizacao == 2):
+                if(marlinlocalizacao == 2 and andar == True):
                     move.linear.x = 0
                     move.linear.y = 3
-                if(marlinlocalizacao == 8):
+                if(marlinlocalizacao == 8 and andar == True):
                     move.linear.x = 3
                     move.linear.y = 0
                 if(marlinlocalizacao == 1):
                     move.linear.x = 0
                     move.linear.y = 0
+                    if(marlinbloco == nemobloco):
+                            move.angular.z = -3
             if(marlinbloco == 2):              # No bloco 2
                 if(marlinlocalizacao == 0):
                     if(7 - x1 >= 0.5):
@@ -150,15 +162,17 @@ def loop():
                         move.linear.y=3
                     else:
                         move.linear.x=-3
-                if(marlinlocalizacao == 2):
+                if(marlinlocalizacao == 2 and andar == True):
                     move.linear.x = 0
                     move.linear.y = -3
-                if(marlinlocalizacao == 4): 
+                if(marlinlocalizacao == 4 and andar == True): 
                     move.linear.x = 3
                     move.linear.y = 0
                 if(marlinlocalizacao == 3):
                     move.linear.x = 0
                     move.linear.y = 0
+                    if(marlinbloco == nemobloco):
+                        move.angular.z = -3
             if(marlinbloco == 3):              # No bloco 3
                 if(marlinlocalizacao == 0):
                     if(-7 - x1 >= 0.5):
@@ -167,15 +181,17 @@ def loop():
                         move.linear.y=3
                     else:
                         move.linear.x=-3
-                if(marlinlocalizacao == 4):
+                if(marlinlocalizacao == 4 and andar == True):
                     move.linear.x = -3
                     move.linear.y = 0
-                if(marlinlocalizacao == 6): 
+                if(marlinlocalizacao == 6 and andar == True): 
                     move.linear.x = 0
                     move.linear.y = -3
                 if(marlinlocalizacao == 5):
                     move.linear.x = 0
                     move.linear.y = 0
+                    if(marlinbloco == nemobloco):
+                        move.angular.z = -3
             if(marlinbloco == 4):              # No bloco 4
                 if(marlinlocalizacao == 0):
                     if(-7 - x1 >= 0.5):
@@ -184,44 +200,47 @@ def loop():
                         move.linear.y=-3
                     else:
                         move.linear.x=-3
-                if(marlinlocalizacao == 8):
+                if(marlinlocalizacao == 8 and andar == True):
                     move.linear.x = -3
                     move.linear.y = 0
-                if(marlinlocalizacao == 6): 
+                if(marlinlocalizacao == 6 and andar == True): 
                     move.linear.x = 0
                     move.linear.y = 3
                 if(marlinlocalizacao == 7):
                     move.linear.x = 0
                     move.linear.y = 0
+                    if(marlinbloco == nemobloco):
+                        move.angular.z = -3
             
             # Caso bloco do Nemo seja diferente do de Marlin
-            if(marlinbloco != nemobloco and marlinlocalizacao != 0):
-                if(marlinlocalizacao == 1):
-                    move.linear.x = 0
-                    move.linear.y = -3
-                if(marlinlocalizacao == 2):
-                    move.linear.x = 0
-                    move.linear.y = -3
-                if(marlinlocalizacao == 3):
-                    move.linear.x = -3
-                    move.linear.y = 0
-                if(marlinlocalizacao == 4):
-                    move.linear.x = -3
-                    move.linear.y = 0
-                if(marlinlocalizacao == 5):
-                    move.linear.x = 0
-                    move.linear.y = 3
-                if(marlinlocalizacao == 6):
-                    move.linear.x = 0
-                    move.linear.y = 3
-                if(marlinlocalizacao == 7):
-                    move.linear.x = 3
-                    move.linear.y = 0
-                if(marlinlocalizacao == 8):
-                    move.linear.x = 3
-                    move.linear.y = 0
+            if(andar == True):
+                if(marlinbloco != nemobloco and marlinlocalizacao != 0):
+                    if(marlinlocalizacao == 1):
+                        move.linear.x = 0
+                        move.linear.y = -3
+                    if(marlinlocalizacao == 2):
+                        move.linear.x = 0
+                        move.linear.y = -3
+                    if(marlinlocalizacao == 3):
+                        move.linear.x = -3
+                        move.linear.y = 0
+                    if(marlinlocalizacao == 4):
+                        move.linear.x = -3
+                        move.linear.y = 0
+                    if(marlinlocalizacao == 5):
+                        move.linear.x = 0
+                        move.linear.y = 3
+                    if(marlinlocalizacao == 6):
+                        move.linear.x = 0
+                        move.linear.y = 3
+                    if(marlinlocalizacao == 7):
+                        move.linear.x = 3
+                        move.linear.y = 0
+                    if(marlinlocalizacao == 8):
+                        move.linear.x = 3
+                        move.linear.y = 0
 
-        rospy.loginfo(marlinlocalizacao)
+        rospy.loginfo(andar)
 
         pub.publish(move)
         
