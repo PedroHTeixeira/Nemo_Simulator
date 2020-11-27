@@ -4,6 +4,8 @@
     <node name='sonar' pkg="nemo_simulator" type='sonar.py'/>
     <node name='auto_move' pkg="nemo_simulator" type='auto_move.py'/>
     <node name='follow' pkg="nemo_simulator" type='follower.py'/>
+    <node name='limits' pkg="nemo_simulator" type='limits.py'/>
+    <node name='interpreter' pkg="nemo_simulator" type='camera.py'/>
     <arg name="world"  default="task"/>
     <arg name="gui"  default="true"/>
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
