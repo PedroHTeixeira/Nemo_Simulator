@@ -70,12 +70,12 @@ def loop():
         teta = math.degrees(teta)#                                                  |
         #                                                                           |
         pub = rospy.Publisher('cmd_vel',Twist, queue_size=10) #               Rua Ikuhara
-        #                                                            (-5;4.3) ------------ (5; 4.3)
+        #                                                            (--7;6) ------------ (7; 6)
         #direita = move.linear.x=3      #                                     |          |
         #esquerda= move.linear.x= -3    #                                     |          |
         #frente = move.linear.y=3       #                       Avenida Daumas|          | Avenida Pavani     --> Eixo x
         #tras = move.linear.y=-3        #                                     |          |
-        #horario = move.angular.z= 3    #                           (-5;-3.3) ------------(5; -3.3)
+        #horario = move.angular.z= 3    #                           (-7;-6.2) ------------(7;-6.2)
         #antihorario = move.angular.z=-3#                                      Rua Koppe
         #paradax = move.linear.x=0
         #paraday = move.linear.y=0
@@ -102,19 +102,19 @@ def loop():
         # Ruas e interseccoes
         if(5 <= y1 <= 6 and 6 <= x1 <= 7):   # Interseccao do bloco 1
             marlinlocalizacao = 1
-        if(-5.2 <= y1 <= 5 and 6 <= x1 <= 7):  # Rua Pavani
+        elif(-6.2 <= y1 <= 5 and 6 <= x1 <= 7):  # Rua Pavani
             marlinlocalizacao = 2
-        if(-6.2 <= y1 <= -5.2 and 6 <= x1 <= 7): # Interseccao do bloco 2
+        elif(-7.2 <= y1 <= -6.2 and 6 <= x1 <= 7): # Interseccao do bloco 2
             marlinlocalizacao = 3
-        if(-6.2 <= y1 <= -5.2 and -6 <= x1 <= 6): # Rua Koppe
+        elif(-7.2 <= y1 <= -6.2 and -6 <= x1 <= 6): # Rua Koppe
             marlinlocalizacao = 4
-        if(-6.2 <= y1 <= -5.2 and -7 <= x1 <= -6): # Interseccao do bloco 3
+        elif(-7.2 <= y1 <= -6.2 and -7 <= x1 <= -6): # Interseccao do bloco 3
             marlinlocalizacao = 5
-        if(-5.2 <= y1 <= 5 and -7 <= x1 <= -6):   # Rua Daumas
+        elif(-6.2 <= y1 <= 5 and -7 <= x1 <= -6):   # Rua Daumas
             marlinlocalizacao = 6
-        if(5 <= y1 <= 6 and -7 <= x1 <= -6):     # Interseccao do bloco 4
+        elif(5 <= y1 <= 6 and -7 <= x1 <= -6):     # Interseccao do bloco 4
             marlinlocalizacao = 7
-        if(5 <= y1 <= 6 and -6 <= x1 <= 6):   # Rua Ikuhara
+        elif(5 <= y1 <= 6 and -6 <= x1 <= 6):   # Rua Ikuhara
             marlinlocalizacao = 8
         else:                               # Perdido
             marlinlocalizacao = 0
@@ -122,26 +122,110 @@ def loop():
         # Comandos caso Marlin esteja procurando Nemo (SearchMode)
         if(SearchMode == True):
 
-            # Caso Marlin se perca
-            if(marlinbloco == 1):              # No bloco 1
-                if(marlinlocalizacao == 0):
-                    if(7 - x1 >= 1):
-                        move.linear.x=2
-                    elif(-1 < 7 - x1 < 1 and y1 > 6):
-                        move.linear.y=-2
-                    else:
-                        move.linear.x=-2
-                if(marlinlocalizacao == 2)
-                    move.linear.x = 0
-                    move.linear.y = 2
-                if(marlinlocalizacao == 8)
-                    move.linear.x = 2
-                    move.linear.y = 0
-                if(marlinlocalizacao == 1)
-                    move.linear.x = 0
-                    move.linear.y = 0
-                    move.angular.z = 2
-        
+            # Ida ao centro do bloco para localizar Nemo ou para Marlin se auto localizar
+            if(marlinlocalizacao == 0):
+                if(marlinbloco == 1):              # No bloco 1
+                    if(marlinlocalizacao == 0):
+                        if(7 - x1 >= 1):
+                            move.linear.x=3
+                        elif(-1 < 7 - x1 < 1 and y1 > 6):
+                            move.linear.y=-3
+                        else:
+                            move.linear.x=-3
+                    if(marlinlocalizacao == 2):
+                        move.linear.x = 0
+                        move.linear.y = 3
+                    if(marlinlocalizacao == 8):
+                        move.linear.x = 3
+                        move.linear.y = 0
+                    if(marlinlocalizacao == 1):
+                        move.linear.x = 0
+                        move.linear.y = 0
+                if(marlinbloco == 2):              # No bloco 2
+                    if(marlinlocalizacao == 0):
+                        if(7 - x1 >= 1):
+                            move.linear.x=3
+                        elif(-1 < 7 - x1 < 1 and y1 < -6.2):
+                            move.linear.y=3
+                        else:
+                            move.linear.x=-3
+                    if(marlinlocalizacao == 2):
+                        move.linear.x = 0
+                        move.linear.y = -3
+                    if(marlinlocalizacao == 4): 
+                        move.linear.x = 3
+                        move.linear.y = 0
+                    if(marlinlocalizacao == 3):
+                        move.linear.x = 0
+                        move.linear.y = 0
+                        if(marlinbloco == nemobloco):
+                            move.angular.z = 3
+                if(marlinbloco == 3):              # No bloco 3
+                    if(marlinlocalizacao == 0):
+                        if(-7 - x1 >= 1):
+                            move.linear.x=3
+                        elif(-1 < -7 - x1 < 1 and y1 < -6.2):
+                            move.linear.y=3
+                        else:
+                            move.linear.x=-3
+                    if(marlinlocalizacao == 4):
+                        move.linear.x = -3
+                        move.linear.y = 0
+                    if(marlinlocalizacao == 6): 
+                        move.linear.x = 0
+                        move.linear.y = -3
+                    if(marlinlocalizacao == 5):
+                        move.linear.x = 0
+                        move.linear.y = 0
+                        if(marlinbloco == nemobloco):
+                            move.angular.z = 3
+                if(marlinbloco == 4):              # No bloco 4
+                    if(marlinlocalizacao == 0):
+                        if(-7 - x1 >= 1):
+                            move.linear.x=3
+                        elif(-1 < -7 - x1 < 1 and y1 > 6):
+                            move.linear.y=-3
+                        else:
+                            move.linear.x=-3
+                    if(marlinlocalizacao == 8):
+                        move.linear.x = -3
+                        move.linear.y = 0
+                    if(marlinlocalizacao == 6): 
+                        move.linear.x = 0
+                        move.linear.y = 3
+                    if(marlinlocalizacao == 7):
+                        move.linear.x = 0
+                        move.linear.y = 0
+                        if(marlinbloco == nemobloco):
+                            move.angular.z = 3
+            
+            # Caso bloco do Nemo seja diferente do de Marlin
+            if(marlinbloco != nemobloco and marlinlocalizacao != 0):
+                    if(marlinlocalizacao == 1):
+                        move.linear.x = 0
+                        move.linear.y = -3
+                    if(marlinlocalizacao == 2):
+                        move.linear.x = 0
+                        move.linear.y = -3
+                    if(marlinlocalizacao == 3):
+                        move.linear.x = -3
+                        move.linear.y = 0
+                    if(marlinlocalizacao == 4):
+                        move.linear.x = -3
+                        move.linear.y = 0
+                    if(marlinlocalizacao == 5):
+                        move.linear.x = 0
+                        move.linear.y = 3
+                    if(marlinlocalizacao == 6):
+                        move.linear.x = 0
+                        move.linear.y = 3
+                    if(marlinlocalizacao == 7):
+                        move.linear.x = 3
+                        move.linear.y = 0
+                    if(marlinlocalizacao == 8):
+                        move.linear.x = 3
+                        move.linear.y = 0
+
         rospy.loginfo(marlinlocalizacao)
 
         pub.publish(move)
