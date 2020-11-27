@@ -21,18 +21,19 @@ def callback(msg):
     m=cv2.moments(mask,False)
     try:
         cx,cy = m['m10']/m['m00'], m['m01']/m['m00']
+        position = PointStamped()
+        position.point.x=cx
+        position.point.y=cy
+        cv2.circle(cv_image,(int(cx),int(cy)), 25, (255,0,0), -1)
+        pub2=rospy.Publisher("nemo_position_camera",PointStamped,queue_size=10)
+        pub2.publish(position)
     except ZeroDivisionError:
-        height, width, channels = mask.shape
-        cy,cx= height/2 , width/2
-    position = PointStamped()
-    position.point.x=cx
-    position.point.y=cy
-    mask_c = cv2.cvtColor(cv_image, cv2.COLOR_HSV2BGR)
-    cv2.circle(mask_c,(int(cx),int(cy)), 50, (0,0,255), -1)
+        pass
     pub=rospy.Publisher("camera/image_interpreted",Image,queue_size=10)
-    pub2=rospy.Publisher("nemo_position_camera",PointStamped,queue_size=10)
-    pub.publish(bridge.cv2_to_imgmsg(mask_c, "bgr8"))
-    pub2.publish(position)
+    pub3=rospy.Publisher("camera/image_masked",Image,queue_size=10)
+    pub.publish(bridge.cv2_to_imgmsg(cv_image, "bgr8"))
+    pub3.publish(bridge.cv2_to_imgmsg(mask,"mono8"))
+    
     rate.sleep()
 
 def reader():
