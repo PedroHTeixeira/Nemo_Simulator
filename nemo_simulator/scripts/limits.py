@@ -8,19 +8,28 @@ import time
 
 def callback(msg):
     pub = rospy.Publisher('cmd_vel',Twist, queue_size=10)
-    pub2 = rospy.Publisher('/warning',Int64, queue_size=10)
     rate = rospy.Rate(10) # 10hz
-    pub2.publish(1)
     x = msg.point.x
-    y = msg.point.y
     move_nemo= Twist()
-    if x > 580 and x < 620:
+    if x > 300 and x < 900:
         move_nemo.angular.z = 0
         move_nemo.linear.y = 4
-    elif x < 580:
-        move_nemo.angular.z = 0.5
-    elif x > 620:
-        move_nemo.angular.z = -0.5
+    elif x < 300:
+        if x < 100:
+            if x == 0:
+                move_nemo.angular.z = 3
+            else:
+                move_nemo.angular.z = 2
+        else:
+            move_nemo.angular.z = 1
+    elif x > 900:
+        if x >1100:
+            if x > 1200:
+                move_nemo.angular.z = -3
+            else:
+                move_nemo.angular.z = -2
+        else:
+            move_nemo.angular.z = -1
     pub.publish(move_nemo)
     rate.sleep()
 
