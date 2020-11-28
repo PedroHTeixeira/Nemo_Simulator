@@ -8,6 +8,7 @@ from geometry_msgs.msg import PointStamped
 from geometry_msgs.msg import Point
 from nav_msgs.msg      import Odometry
 from std_msgs.msg      import Int64
+import time
 
 from tf.transformations import euler_from_quaternion 
 # Necessario para a conversao para Euler
@@ -32,7 +33,7 @@ teste = True
 horario = True
 
 #--------------------------------------------------------------------------------------------#
-def lost(msg);
+def lost(msg):
     global SearchMode
 
     if lost.data == 1:

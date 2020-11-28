@@ -6,6 +6,7 @@ from cv_bridge import CvBridge
 import time
 import numpy as np
 from geometry_msgs.msg import PointStamped
+from std_msgs.msg import Int64
 
 def callback(msg):
     rate = rospy.Rate(10)
