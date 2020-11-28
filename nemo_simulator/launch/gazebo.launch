@@ -3,6 +3,7 @@
     <rosparam command="load" file="$(find nemo_simulator)/param/sonar.yaml"/>
     <node name='sonar' pkg="nemo_simulator" type='sonar.py'/>
     <node name='auto_move' pkg="nemo_simulator" type='auto_move.py'/>
+    <node name='Stalker' pkg="nemo_simulator" type='Stalker.py'/>
     <node name='limits' pkg="nemo_simulator" type='limits.py'/>
     <node name='interpreter' pkg="nemo_simulator" type='camera.py'/>
     <arg name="world"  default="task"/>

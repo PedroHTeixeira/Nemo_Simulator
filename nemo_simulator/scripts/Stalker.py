@@ -7,6 +7,7 @@ from geometry_msgs.msg import Twist
 from geometry_msgs.msg import PointStamped
 from geometry_msgs.msg import Point
 from nav_msgs.msg      import Odometry
+from std_msgs.msg      import Int64
 
 from tf.transformations import euler_from_quaternion 
 # Necessario para a conversao para Euler
@@ -29,6 +30,17 @@ andar = True
 SearchMode  = True
 teste = True
 horario = True
+
+#--------------------------------------------------------------------------------------------#
+def lost(msg);
+    global SearchMode
+
+    if lost.data == 1:
+        SearchMode = True
+    else:
+        SearchMode = False
+
+
 
 #--------------------------------------------------------------------------------------------#
 
@@ -56,30 +68,23 @@ def loop():
     rospy.init_node('Stalker')
   
     rospy.Subscriber("/sonar_data", PointStamped, sonar)
-    rospy.Subscriber('/odom', Odometry, odometria) 
+    rospy.Subscriber('/odom', Odometry, odometria)
+    rospy.Subscriber('/lost', Int64, lost) 
 
     move = Twist()
+    time.sleep(20)
 
     #--------------------------------------------------------------------------------------------#
 
     while not rospy.is_shutdown():
-        global nemobloco,marlinbloco,marlinlocalizacao,Searchmode,andar,teste,horario
+        global nemobloco,marlinbloco,marlinlocalizacao,andar,teste,horario
 
         x2 = x1 - deltax # Nemo
         y2 = y1 - deltay
-        teta = math.atan2(deltax,deltay)#                                           ^  Eixo y
-        teta = math.degrees(teta)#                                                  |
-        #                                                                           |
-        pub = rospy.Publisher('cmd_vel',Twist, queue_size=10) #               Rua Ikuhara
-        #                                                              (-7;6) ------------ (7; 6)
-        #direita= move.linear.x= 3      #                                     |          |
-        #esquerda= move.linear.x= -3    #                                     |          |
-        #frente = move.linear.y=3       #                       Avenida Daumas|          | Avenida Pavani   --> Eixo x
-        #tras = move.linear.y=-3        #                                     |          |
-        #horario = move.angular.z= 3    #                           (-7;-6.2) ------------(7;-6.2)
-        #antihorario = move.angular.z=-3#                                      Rua Koppe
-        #paradax = move.linear.x=0
-        #paraday = move.linear.y=0
+        teta = math.atan2(deltax,deltay)
+        teta = math.degrees(teta)
+        
+        pub = rospy.Publisher('cmd_vel',Twist, queue_size=10) #               
 
         # Funcoes para identificacao de posicoes
         if(0 < x2 <= 10 and 0 < y2 <= 10):          # Nemo esta no bloco a (bloco 1)
@@ -294,10 +299,9 @@ def loop():
        
        
         # Comandos caso Marlin tenha encontrado Nemo (StalkerMode)
-
-        rospy.loginfo(marlinlocalizacao)
-
-        pub.publish(move)
+        else:
+            rospy.loginfo(marlinlocalizacao)
+            pub.publish(move)
 
 #--------------------------------------------------------------------------------------------#
 
@@ -306,10 +310,5 @@ if __name__ == '__main__':
         loop()
     except rospy.ROSInterruptException:
         pass
-
-#--------------------------------------------------------------------------------------------#
-
-time.sleep(20)
-rospy.spin()
 
 #--------------------------------------------------------------------------------------------#
