@@ -34,7 +34,7 @@ horario = True
 x=0
 #--------------------------------------------------------------------------------------------#
 def lost(msg):
-    global SearchMode
+    global SearchMode, x
 
     if msg.data == 1 and x==0:
         SearchMode = True
@@ -317,12 +317,11 @@ def loop():
                         move.linear.x = -3
                         move.linear.y = 0
                         move.angular.z = 0
-       
-       
+            pub.publish(move)
         # Comandos caso Marlin tenha encontrado Nemo (StalkerMode)
         else:
             rospy.loginfo(marlinlocalizacao)
-            pub.publish(move)
+            
 
 #--------------------------------------------------------------------------------------------#
 
