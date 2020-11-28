@@ -27,7 +27,7 @@ def callback(msg):
         pub2=rospy.Publisher("nemo_position_camera",PointStamped,queue_size=10)
         pub2.publish(position)
     except ZeroDivisionError:
-        pass
+        cv2.putText(cv_image,'Red Not Found',(10,500), cv2.FONT_HERSHEY_SIMPLEX, 4,(0,0,255),6,cv2.LINE_AA)
     pub=rospy.Publisher("camera/image_interpreted",Image,queue_size=10)
     pub3=rospy.Publisher("camera/image_masked",Image,queue_size=10)
     pub.publish(bridge.cv2_to_imgmsg(cv_image, "bgr8"))

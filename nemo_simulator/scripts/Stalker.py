@@ -54,7 +54,7 @@ def sonar(msg):
 def loop():
 
     rospy.init_node('Stalker')
-
+  
     rospy.Subscriber("/sonar_data", PointStamped, sonar)
     rospy.Subscriber('/odom', Odometry, odometria) 
 
@@ -298,7 +298,7 @@ def loop():
         rospy.loginfo(marlinlocalizacao)
 
         pub.publish(move)
-        
+
 #--------------------------------------------------------------------------------------------#
 
 if __name__ == '__main__':
