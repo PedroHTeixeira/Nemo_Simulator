@@ -25,9 +25,9 @@ teta = 0
 nemobloco = 0
 marlinbloco = 0
 andar = True
-StalkerMode = False
 SearchMode  = True
 teste = True
+horario = True
 
 #--------------------------------------------------------------------------------------------#
 
@@ -62,7 +62,7 @@ def loop():
     #--------------------------------------------------------------------------------------------#
 
     while not rospy.is_shutdown():
-        global nemobloco,marlinbloco,marlinlocalizacao,Searchmode,StalkerMode,andar,teste
+        global nemobloco,marlinbloco,marlinlocalizacao,Searchmode,andar,teste,horario
 
         x2 = x1 - deltax # Nemo
         y2 = y1 - deltay
@@ -217,8 +217,13 @@ def loop():
                         move.angular.z = -3
             
             # Caso bloco do Nemo seja diferente do de Marlin
-            if(andar == True):
-                if(marlinbloco != nemobloco and marlinlocalizacao != 0):
+            if(andar == True and marlinbloco != nemobloco and marlinlocalizacao != 0):
+                if(marlinbloco - nemobloco > 0 or marlinbloco - nemobloco == -3):
+                    horario = False
+                else:
+                    horario = True
+
+                if(horario == True): # Horario
                     if(marlinlocalizacao == 1):
                         move.linear.x = 0
                         move.linear.y = -3
@@ -248,9 +253,46 @@ def loop():
                         move.linear.y = 0
                         move.angular.z = 0
                     if(marlinlocalizacao == 8):
+                        move.linear.x = 0
+                        move.linear.y = 3
+                        move.angular.z = 0
+
+                else:                # Anti horario
+                    if(marlinlocalizacao == 1):
+                        move.linear.x = -3
+                        move.linear.y = 0
+                        move.angular.z = 0
+                    if(marlinlocalizacao == 2):
+                        move.linear.x = 0
+                        move.linear.y = 3
+                        move.angular.z = 0
+                    if(marlinlocalizacao == 3):
+                        move.linear.x = 0
+                        move.linear.y = 3
+                        move.angular.z = 0
+                    if(marlinlocalizacao == 4):
                         move.linear.x = 3
                         move.linear.y = 0
                         move.angular.z = 0
+                    if(marlinlocalizacao == 5):
+                        move.linear.x = 3
+                        move.linear.y = 0
+                        move.angular.z = 0
+                    if(marlinlocalizacao == 6):
+                        move.linear.x = 0
+                        move.linear.y = -3
+                        move.angular.z = 0
+                    if(marlinlocalizacao == 7):
+                        move.linear.x = 0
+                        move.linear.y = -3
+                        move.angular.z = 0
+                    if(marlinlocalizacao == 8):
+                        move.linear.x = -3
+                        move.linear.y = 0
+                        move.angular.z = 0
+       
+       
+        # Comandos caso Marlin tenha encontrado Nemo (StalkerMode)
 
         rospy.loginfo(andar)
 
