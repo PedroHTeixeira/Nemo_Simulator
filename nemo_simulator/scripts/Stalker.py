@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# Movimentacao ponto A ao ponto B
+# Lucca Gandra e Pedro Teixeira 
+# Projeto final Capacitacao Nautilus 
 
 import rospy
 from geometry_msgs.msg import Twist
@@ -70,10 +71,10 @@ def loop():
         teta = math.degrees(teta)#                                                  |
         #                                                                           |
         pub = rospy.Publisher('cmd_vel',Twist, queue_size=10) #               Rua Ikuhara
-        #                                                            (--7;6) ------------ (7; 6)
-        #direita = move.linear.x=3      #                                     |          |
+        #                                                              (-7;6) ------------ (7; 6)
+        #direita= move.linear.x= 3      #                                     |          |
         #esquerda= move.linear.x= -3    #                                     |          |
-        #frente = move.linear.y=3       #                       Avenida Daumas|          | Avenida Pavani     --> Eixo x
+        #frente = move.linear.y=3       #                       Avenida Daumas|          | Avenida Pavani   --> Eixo x
         #tras = move.linear.y=-3        #                                     |          |
         #horario = move.angular.z= 3    #                           (-7;-6.2) ------------(7;-6.2)
         #antihorario = move.angular.z=-3#                                      Rua Koppe
@@ -128,12 +129,12 @@ def loop():
                 teste = False
 
             if(andar == False and nemobloco != marlinbloco):
-                if(yaw < -0.04):
+                if(yaw < -0.03):
                     move.angular.z = 3
-                if(yaw > 0.04):
+                if(yaw > 0.03):
                     move.angular.z = -3
 
-            if (-0.04 < yaw < 0.04):
+            if (-0.03 < yaw < 0.03):
                 andar = True
             else:
                 andar = False
@@ -162,7 +163,7 @@ def loop():
                 if(marlinlocalizacao == 0):
                     if(7 - x1 >= 0.5):
                         move.linear.x=3
-                    elif(-0.5 < 7 - x1 < 0.5 and y1 < -6.2):
+                    elif(-0.5 < 7 - x1 < 0.5 and y1 < -6.4):
                         move.linear.y=3
                     else:
                         move.linear.x=-3
@@ -181,7 +182,7 @@ def loop():
                 if(marlinlocalizacao == 0):
                     if(-7 - x1 >= 0.5):
                         move.linear.x=3
-                    elif(-0.5 < -7 - x1 < 0.5 and y1 < -6.2):
+                    elif(-0.5 < -7 - x1 < 0.5 and y1 < -6.4):
                         move.linear.y=3
                     else:
                         move.linear.x=-3
@@ -294,7 +295,7 @@ def loop():
        
         # Comandos caso Marlin tenha encontrado Nemo (StalkerMode)
 
-        rospy.loginfo(andar)
+        rospy.loginfo(marlinlocalizacao)
 
         pub.publish(move)
         
