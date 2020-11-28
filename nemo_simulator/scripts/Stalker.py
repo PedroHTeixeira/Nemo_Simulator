@@ -6,7 +6,8 @@ from geometry_msgs.msg import Twist
 from geometry_msgs.msg import PointStamped
 from geometry_msgs.msg import Point
 from nav_msgs.msg      import Odometry
-
+from std_msgs.msg import Int64
+import time
 from tf.transformations import euler_from_quaternion 
 # Necessario para a conversao para Euler
 
@@ -26,6 +27,7 @@ nemobloco = 0
 marlinbloco = 0
 StalkerMode = False
 SearchMode  = True
+w=0
 
 #--------------------------------------------------------------------------------------------#
 
@@ -47,12 +49,17 @@ def sonar(msg):
     deltax = msg.point.x
     deltay = msg.point.y
 
+def warning(msg):
+    w = msg.data
+    if w == 1:
+        SearchMode  = False
 
 def loop():
 
     rospy.init_node('Stalker')
-
+    time.sleep(20)
     rospy.Subscriber("/sonar_data", PointStamped, sonar)
+    rospy.Subscriber("/warning", Int64, warning)
     rospy.Subscriber('/odom', Odometry, odometria) 
 
     move = Twist()
@@ -224,7 +231,6 @@ def loop():
         rospy.loginfo(marlinlocalizacao)
 
         pub.publish(move)
-        
 #--------------------------------------------------------------------------------------------#
 
 if __name__ == '__main__':
@@ -235,7 +241,6 @@ if __name__ == '__main__':
 
 #--------------------------------------------------------------------------------------------#
 
-time.sleep(20)
-rospy.spin()
+
 
 #--------------------------------------------------------------------------------------------#

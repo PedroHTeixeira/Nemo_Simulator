@@ -17,8 +17,11 @@ def callback(msg):
     mask = cv2.inRange(hsv,light_red,dark_red)
     mask = cv2.dilate(mask, None, iterations=2)
     mask = cv2.erode(mask, None, iterations=2)
-    ksize = (50, 50) 
-    m=cv2.moments(mask,False)
+    dimensions=mask.shape
+    contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    blank_image = np.zeros((dimensions[0],dimensions[1],3), np.uint8)
+    img_ctr=cv2.drawContours(blank_image, contours, -1, (0,255,0), 3)
+    m=cv2.moments(img_ctr,False)
     try:
         cx,cy = m['m10']/m['m00'], m['m01']/m['m00']
         position = PointStamped()
