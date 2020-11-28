@@ -13,7 +13,7 @@ def callback(msg):
     move_nemo= Twist()
     if x > 300 and x < 900:
         move_nemo.angular.z = 0
-        move_nemo.linear.y = 4
+        move_nemo.linear.y = 3
     elif x < 300:
         if x < 100:
             if x == 0:

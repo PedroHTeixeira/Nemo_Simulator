@@ -31,13 +31,33 @@ andar = True
 SearchMode  = True
 teste = True
 horario = True
-
+x=0
 #--------------------------------------------------------------------------------------------#
 def lost(msg):
     global SearchMode
 
-    if lost.data == 1:
+    if msg.data == 1 and x==0:
         SearchMode = True
+        pub_speed=rospy.Publisher("cmd_vel",Twist,queue_size=10)
+        stop=Twist()
+        stop.linear.x=0
+        stop.linear.y=0
+        stop.linear.z=0
+        stop.angular.z=0
+        pub_speed.publish(stop)
+        x=1
+    elif msg.data == 1 and x ==1:
+        SearchMode = True 
+    elif msg.data ==0 and x ==1:
+        SearchMode = False
+        pub_speed=rospy.Publisher("cmd_vel",Twist,queue_size=10)
+        stop=Twist()
+        stop.linear.x=0
+        stop.linear.y=0
+        stop.linear.z=0
+        stop.angular.z=0
+        pub_speed.publish(stop)
+        x=0
     else:
         SearchMode = False
 
