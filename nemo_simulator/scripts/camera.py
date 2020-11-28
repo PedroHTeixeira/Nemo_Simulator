@@ -7,6 +7,7 @@ import time
 import numpy as np
 from geometry_msgs.msg import PointStamped
 from std_msgs.msg import Float64MultiArray 
+from std_msgs.msg import Int64
 
 def callback(msg):
     rate = rospy.Rate(10)
@@ -27,6 +28,7 @@ def callback(msg):
     pub0.publish(message)
     blank_image = np.zeros((dimensions[0],dimensions[1],3), np.uint8)
     img_lucca = cv2.drawContours(blank_image, contours_2, -1, (255,255,255), 3)
+    img_lucca= cv2.cvtColor(img_lucca, cv2.COLOR_BGR2GRAY)
     img_ctr=cv2.drawContours(blank_image, contours, -1, (255,255,255), 3)
     img_ctr = cv2.cvtColor(img_ctr, cv2.COLOR_BGR2GRAY)
     m=cv2.moments(img_ctr,False)
@@ -38,8 +40,12 @@ def callback(msg):
         cv2.circle(cv_image,(int(cx),int(cy)), 25, (255,0,0), -1)
         pub2=rospy.Publisher("nemo_position_camera",PointStamped,queue_size=10)
         pub2.publish(position)
+        pub_Stalker=rospy.Publisher('lost',Int64,queue_size=10)
+        pub_Stalker.publish(0)
     except ZeroDivisionError:
         cv2.putText(cv_image,'Red Not Found',(10,500), cv2.FONT_HERSHEY_SIMPLEX, 4,(0,0,255),6,cv2.LINE_AA)
+        pub_Stalker=rospy.Publisher('lost',Int64,queue_size=10)
+        pub_Stalker.publish(1)
     pub=rospy.Publisher("camera/image_interpreted",Image,queue_size=10)
     pub3=rospy.Publisher("camera/image_masked_contours",Image,queue_size=10)
     pub5=rospy.Publisher("camera/image_masked_corners",Image,queue_size=10)
