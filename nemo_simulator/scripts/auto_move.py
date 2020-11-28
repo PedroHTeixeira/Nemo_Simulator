@@ -10,7 +10,7 @@ def turn():
     move_nemo= Twist()
     move_nemo.angular.z=4
     pub.publish(move_nemo)
-    time.sleep(2.80)
+    time.sleep(1.40)
     move_nemo.angular.z=0
     move_nemo.linear.y=-1
     pub.publish(move_nemo)
