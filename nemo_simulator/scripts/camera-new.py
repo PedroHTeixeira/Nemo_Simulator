@@ -46,7 +46,8 @@ class DataHandler():
         contour_mask, contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         contour_mask_2, contours_2, hierarchy_2 = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        #Create Blank Image 
+        #Create Blank Image
+        dimensions = cv_image.shape
         blank_image = np.zeros((dimensions[0],dimensions[1],3), np.uint8)
 
         #Draw the Corners and change colorspaces
@@ -79,7 +80,6 @@ class DataHandler():
             #Add the corners to a msg and publish it 
             message =Float64MultiArray() 
             message.data = contours_2
-            print(message)
             self.pub0.publish(message)
         except ZeroDivisionError:
             #If moments can't find the cylinder it should show it on the screen

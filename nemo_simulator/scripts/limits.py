@@ -22,26 +22,26 @@ class Follow_Red():
         move_nemo= Twist()
 
         #Depending on the Position the robot will move diferently
-        if x > 300 and x < 900:
+        if x > 320 and x < 720:
             move_nemo.angular.z = 0
-            move_nemo.linear.y = 3
-        elif x < 300:
-            if x < 100:
-                if x == 0:
-                    move_nemo.angular.z = 3
+            move_nemo.linear.y = 3.35
+        elif x < 320:
+            if x < 220:
+                if x < 120:
+                    move_nemo.angular.z = 9
                 else:
-                    move_nemo.angular.z = 2
+                    move_nemo.angular.z = 8
             else:
-                move_nemo.angular.z = 1
-        elif x > 900:
-            if x >1100:
-                if x > 1200:
-                    move_nemo.angular.z = -3
+                move_nemo.angular.z = 7
+        elif x > 720:
+            if x >820:
+                if x > 920:
+                    move_nemo.angular.z = -9
                 else:
-                    move_nemo.angular.z = -2
+                    move_nemo.angular.z = -8
             else:
-                move_nemo.angular.z = -1
-        pub.publish(move_nemo)
+                move_nemo.angular.z = -7
+        self.pub.publish(move_nemo)
         rate.sleep()
 
 def security():

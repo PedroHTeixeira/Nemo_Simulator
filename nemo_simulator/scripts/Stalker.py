@@ -19,17 +19,13 @@ x1 = 0
 x2 = 0
 y1 = 0
 y2 = 0
-roll = 0
-pitch = 0
 yaw = 0
 deltax = 0
 deltay = 0
-teta = 0
 nemobloco = 0
 marlinbloco = 0
 andar = True
 SearchMode  = True
-teste = True
 horario = True
 x=0
 #--------------------------------------------------------------------------------------------#
@@ -37,6 +33,7 @@ def lost(msg):
     global SearchMode, x
 
     if msg.data == 1 and x==0:
+        time.sleep(1)
         SearchMode = True
         pub_speed=rospy.Publisher("cmd_vel",Twist,queue_size=10)
         stop=Twist()
@@ -66,7 +63,7 @@ def lost(msg):
 #--------------------------------------------------------------------------------------------#
 
 def odometria(msg):
-    global x1,y1,roll,pitch,yaw
+    global x1,y1,yaw
 
     x1 = msg.pose.pose.position.x # Marlin
     y1 = msg.pose.pose.position.y
@@ -98,12 +95,10 @@ def loop():
     #--------------------------------------------------------------------------------------------#
 
     while not rospy.is_shutdown():
-        global nemobloco,marlinbloco,marlinlocalizacao,andar,teste,horario
+        global nemobloco,marlinbloco,marlinlocalizacao,andar,horario
 
         x2 = x1 - deltax # Nemo
         y2 = y1 - deltay
-        teta = math.atan2(deltax,deltay)
-        teta = math.degrees(teta)
         
         pub = rospy.Publisher('cmd_vel',Twist, queue_size=10) #               
 
@@ -148,11 +143,6 @@ def loop():
 
         # Comandos caso Marlin esteja procurando Nemo (SearchMode)
         if(SearchMode == True):
-            
-            if(nemobloco == marlinbloco):
-                teste = True
-            else:
-                teste = False
 
             if(andar == False and nemobloco != marlinbloco):
                 if(yaw < -0.03):
