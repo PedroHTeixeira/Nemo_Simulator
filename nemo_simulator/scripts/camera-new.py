@@ -35,10 +35,18 @@ class DataHandler():
         bridge = CvBridge()
         cv_image = bridge.imgmsg_to_cv2(msg, "bgr8")
 
-        #Create mask in Red
-        light_red=(0,0,0)
-        dark_red=(0,0,255)
-        mask = cv2.inRange(cv_image,light_red,dark_red)
+        #Changing colorsapces
+        hsv = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
+
+        # Color Range
+        if self.y>0:
+            light_red=(0,149,138)
+            dark_red=(0,255,177)
+            mask = cv2.inRange(hsv,light_red,dark_red)
+        else:
+            light_red=(0,0,0)
+            dark_red=(0,0,255)
+            mask = cv2.inRange(cv_image,light_red,dark_red)
         
 
         #Mask Corrections
