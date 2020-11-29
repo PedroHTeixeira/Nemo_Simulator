@@ -8,7 +8,7 @@ import numpy as np
 from geometry_msgs.msg import PointStamped
 from std_msgs.msg import Float64MultiArray 
 from std_msgs.msg import Int64
-
+from nav_msgs.msg import Odometry
 
 class DataHandler():
 
@@ -19,9 +19,14 @@ class DataHandler():
         self.pub=rospy.Publisher("camera/image_interpreted",Image,queue_size=10)
         self.pub3=rospy.Publisher("camera/image_masked_contours",Image,queue_size=10)
         self.pub5=rospy.Publisher("camera/image_masked_corners",Image,queue_size=10)
+        self.sub2=rospy.Subscriber("odom", Odometry, self.callback2)
         self.pub4=rospy.Publisher("camera/image_masked",Image,queue_size=10)
         self.pub0=rospy.Publisher("contours",Float64MultiArray,queue_size=10)
         self.pub_Stalker=rospy.Publisher('lost',Int64,queue_size=10)
+
+    def callback2(self,msg):
+        self.x = msg.pose.pose.position.x 
+        self.y = msg.pose.pose.position.y
 
     def callback(self,msg):
         rate = rospy.Rate(10)
@@ -30,13 +35,11 @@ class DataHandler():
         bridge = CvBridge()
         cv_image = bridge.imgmsg_to_cv2(msg, "bgr8")
 
-        #Changing colorsapces
-        hsv = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
-
-        # Color Range
-        light_red=(0,149,140)
-        dark_red=(0,255,177)
-        mask = cv2.inRange(hsv,light_red,dark_red)
+        #Create mask in Red
+        light_red=(0,0,0)
+        dark_red=(0,0,255)
+        mask = cv2.inRange(cv_image,light_red,dark_red)
+        
 
         #Mask Corrections
         mask = cv2.dilate(mask, None, iterations=2)
